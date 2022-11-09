@@ -1,39 +1,71 @@
+import { format, formatDistanceToNow } from 'date-fns';
+import ptBR from 'date-fns/locale/pt-BR'; 
+import { useState } from 'react';
+
+import { Avatar } from './Avatar';
 import { Comment } from './Comment';
 import styles from './Post.module.css';
 
-export function Post() {
+export function Post({author, publishedAt, content}) {
+    const [comments, setComments] = useState([1, 2, 3])
+
+    const publishedDateFormatted = format(publishedAt, "d 'de' LLLL 'às' HH:mm'h'", 
+    {locale: ptBR,
+    })
+
+    const publishedDateRelativeTonow = formatDistanceToNow(publishedAt, {
+        locale: ptBR, 
+        addSuffix: true,
+    })
+
+    function handleCreateNewComment(){
+        event.preventDefault()
+
+        setComments([...comments, comments.length + 1])
+    
+    }
+
     return (
         <article className={styles.post}>
             <header>
                 <div className={styles.author}>
-                    <img className={styles.avatar} src="https://avatars.githubusercontent.com/u/30728761?s=96&v=4"/>
+                    <Avatar src={author.avatarUrl}/>
                     <div className={styles.authorInfo}>
-                        <strong>Danilo Martins</strong>
-                        <span>web developer</span>
+                        <strong>{author.name}</strong>
+                        <span>{author.role}</span>
                     </div>
                 </div>
-                <time title="21 de Outubro às 08:30" dateTime="2022-10-10 08:13:38">publica há 1 hora</time>
+                <time title={publishedDateFormatted} dateTime={publishedAt.toISOString()}>
+                    {publishedDateRelativeTonow}
+                </time>
+            
             </header>
+
             <div className={styles.content}>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p> 
-                <p>Incidunt ipsum eveniet eius modi iste quasi veniam velit </p>
-                <p>sapiente minima accusamus, earum impedit tempora rem corrupti alias dolorum explicabo dicta cum.</p>
-                
-                <p> <a href=''>Jane.design/doctorcare</a></p>
-                <p><a href="">#novoprojeto #nlu #rocketseat</a></p>
+                {content.map(line => {
+                    if (line.type == 'paragraph') {
+                        return <p>{line.content}</p>;
+                    } else if (line.type == 'link') {
+                        return <p><a href="#">{line.content}</a></p>
+                    }
+                })}
             </div>
 
-            <form className={styles.commentForm}>
+            <form onSubmit={handleCreateNewComment} className={styles.commentForm}>
                 <strong>Deixe seu feedback</strong>
 
                 <textarea
                     placeholder='Deixe um comentário'
                 />
+                
                 <button type="submit">Publicar</button>
+                
             </form>
             
             <div className={styles.commentList}>
-                <Comment />
+                {comments.map(comment => {
+                    return <Comment />
+                })}
             </div>
         </article>
     )
