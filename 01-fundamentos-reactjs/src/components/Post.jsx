@@ -64,6 +64,7 @@ export function Post({author, publishedAt, content}) {
                 <textarea
                     name = 'comment'
                     placeholder='Deixe um comentário'
+                    value = {newCommentText}
                     onChange={handleNewCommentChange}
                 />
                 
